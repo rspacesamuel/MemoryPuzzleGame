@@ -68,12 +68,15 @@ def incrementXY(eachBoxAcross):
 
 def main():
     #variables for MOUSEBUTTONUP action
-    firstBoxColorShape = ()
-    secondBoxColorShape = ()
+    #these 2 are lists instead of tuples just so that they can be changed along the way, otherwise they store exactly one tuple of color, shape
+    firstBoxColorShape = []
+    secondBoxColorShape = []
     firstBoxIndex = -1
     secondBoxIndex = -1
     numBoxesRevealed = 0
-
+    prevTopLeftX = 0
+    prevTopLeftY = 0
+    
     pygame.init()
     gamesurface = pygame.display.set_mode ((WINDOW_WIDTH, WINDOW_HEIGHT))
     gamesurface.fill(GAME_BKGRND_COLOR)
@@ -94,7 +97,7 @@ def main():
             self._boxHighlighted = False
             self._boxRevealed = False
             self._firstOfTwoBoxes = False
-            self._colorAndShape = ()
+            self._colorAndShape = []
             pygame.draw.rect(gamesurface, self.boxOuterColor, (self._topLeftX, self._topLeftY, self.boxWidth, self.boxHeight),0)
             pygame.draw.rect(gamesurface, self.boxBorderColor, (self._topLeftX, self._topLeftY, self.boxWidth, self.boxHeight),2)
 
@@ -121,104 +124,115 @@ def main():
         def revealBox(self, mouseX, mouseY):
             if self.mousePointerOnBox(mouseX, mouseY):
                 self._boxRevealed = True
-                                
-                if self._colorAndShape[1] == "SQUARE":
+                                    
+                if self._colorAndShape[0][1] == "SQUARE":
                     #assign point list (x,y of each vertex) to a variable
                     squareVertices = [(self._topLeftX+15, self._topLeftY+15), (self.boxWidth-30, self.boxHeight-30)]
                     #"break open" the box by painting background color
                     pygame.draw.rect(gamesurface, GAME_BKGRND_COLOR, (self._topLeftX, self._topLeftY, self.boxWidth, self.boxHeight), 0)
                     #draw the shape and color for the revealed object (in this case SQUARE) "inside" the "opened" box
-                    pygame.draw.rect(gamesurface, self._colorAndShape[0], squareVertices, 0)
+                    pygame.draw.rect(gamesurface, self._colorAndShape[0][0], squareVertices, 0)
                     #do the same steps for all revealed objects below
                 
-                elif self._colorAndShape[1] == "SQUAREDONUT":
+                elif self._colorAndShape[0][1] == "SQUAREDONUT":
                     sqrDonutVertices = [(self._topLeftX+15, self._topLeftY+15), (self.boxWidth-30, self.boxHeight-30)]
                     pygame.draw.rect(gamesurface, GAME_BKGRND_COLOR, (self._topLeftX, self._topLeftY, self.boxWidth, self.boxHeight), 0)
-                    pygame.draw.rect(gamesurface, self._colorAndShape[0], sqrDonutVertices, 6)
+                    pygame.draw.rect(gamesurface, self._colorAndShape[0][0], sqrDonutVertices, 6)
 
-                elif self._colorAndShape[1] == "DIAMOND":
+                elif self._colorAndShape[0][1] == "DIAMOND":
                     diamondVertices = [(self._topLeftX+int(self.boxWidth/2),self._topLeftY+10), (self._topLeftX+self.boxWidth-10,self._topLeftY+int(self.boxHeight/2)), (self._topLeftX+int(self.boxWidth/2),self._topLeftY+self.boxHeight-10), (self._topLeftX+10,self._topLeftY+int(self.boxHeight/2))]
                     pygame.draw.rect(gamesurface, GAME_BKGRND_COLOR, (self._topLeftX, self._topLeftY, self.boxWidth, self.boxHeight), 0)
-                    pygame.draw.polygon(gamesurface, self._colorAndShape[0], diamondVertices, 0)
+                    pygame.draw.polygon(gamesurface, self._colorAndShape[0][0], diamondVertices, 0)
                     
-                elif self._colorAndShape[1] == "TRIANGLE":
+                elif self._colorAndShape[0][1] == "TRIANGLE":
                     triangleVertices = [(self._topLeftX+int(self.boxWidth/2),self._topLeftY+10), (self._topLeftX+self.boxWidth-10,self._topLeftY+self.boxHeight-10), (self._topLeftX+10, self._topLeftY+self.boxHeight-10)]
                     pygame.draw.rect(gamesurface, GAME_BKGRND_COLOR, (self._topLeftX, self._topLeftY, self.boxWidth, self.boxHeight), 0)
-                    pygame.draw.polygon(gamesurface, self._colorAndShape[0], triangleVertices, 0)
+                    pygame.draw.polygon(gamesurface, self._colorAndShape[0][0], triangleVertices, 0)
        
-                elif self._colorAndShape[1] == "CIRCLE":
+                elif self._colorAndShape[0][1] == "CIRCLE":
                     circleCenter = (self._topLeftX+int(self.boxWidth/2), self._topLeftY+int(self.boxHeight/2))
                     radius = int(self.boxWidth/2)-10
                     pygame.draw.rect(gamesurface, GAME_BKGRND_COLOR, (self._topLeftX, self._topLeftY, self.boxWidth, self.boxHeight),0)
-                    pygame.draw.circle(gamesurface, self._colorAndShape[0], circleCenter, radius, 0)
+                    pygame.draw.circle(gamesurface, self._colorAndShape[0][0], circleCenter, radius, 0)
 
-                elif self._colorAndShape[1] == "DONUT":
+                elif self._colorAndShape[0][1] == "DONUT":
                     circleCenter = (self._topLeftX+int(self.boxWidth/2), self._topLeftY+int(self.boxHeight/2))
                     radius = int(self.boxWidth/2)-12
                     pygame.draw.rect(gamesurface, GAME_BKGRND_COLOR, (self._topLeftX, self._topLeftY, self.boxWidth, self.boxHeight),0)
-                    pygame.draw.circle(gamesurface, self._colorAndShape[0], circleCenter, radius, 6)
+                    pygame.draw.circle(gamesurface, self._colorAndShape[0][0], circleCenter, radius, 6)
                
-                elif self._colorAndShape[1] == "CROSS":
+                elif self._colorAndShape[0][1] == "CROSS":
                     line1StartPos = (self._topLeftX+int(self.boxWidth/2), self._topLeftY+10)
                     line1EndPos = (self._topLeftX+int(self.boxWidth/2), self._topLeftY+self.boxHeight-10)
                     line2StartPos = (self._topLeftX+10,self._topLeftY+int(self.boxHeight/2))
                     line2EndPos = (self._topLeftX+self.boxWidth-10,self._topLeftY+int(self.boxHeight/2))
                     pygame.draw.rect(gamesurface, GAME_BKGRND_COLOR, (self._topLeftX, self._topLeftY, self.boxWidth, self.boxHeight),0)
-                    pygame.draw.line(gamesurface, self._colorAndShape[0], line1StartPos, line1EndPos, 3)
-                    pygame.draw.line(gamesurface, self._colorAndShape[0], line2StartPos, line2EndPos, 3)
+                    pygame.draw.line(gamesurface, self._colorAndShape[0][0], line1StartPos, line1EndPos, 3)
+                    pygame.draw.line(gamesurface, self._colorAndShape[0][0], line2StartPos, line2EndPos, 3)
 
-                elif self._colorAndShape[1] == "X":
+                elif self._colorAndShape[0][1] == "X":
                     line1StartPos = (self._topLeftX+10, self._topLeftY+10)
                     line1EndPos = (self._topLeftX+self.boxWidth-10, self._topLeftY+self.boxHeight-10)
                     line2StartPos = (self._topLeftX+self.boxWidth-10,self._topLeftY+10)
                     line2EndPos = (self._topLeftX+10,self._topLeftY+self.boxHeight-10)
                     pygame.draw.rect(gamesurface, GAME_BKGRND_COLOR, (self._topLeftX, self._topLeftY, self.boxWidth, self.boxHeight),0)
-                    pygame.draw.line(gamesurface, self._colorAndShape[0], line1StartPos, line1EndPos, 3)
-                    pygame.draw.line(gamesurface, self._colorAndShape[0], line2StartPos, line2EndPos, 3)
+                    pygame.draw.line(gamesurface, self._colorAndShape[0][0], line1StartPos, line1EndPos, 3)
+                    pygame.draw.line(gamesurface, self._colorAndShape[0][0], line2StartPos, line2EndPos, 3)
                                                                                                                                                                      
     #instantiate the Object List for Box
     boxes = [Box(*incrementXY(eachBoxAcross)) for eachBoxDown in range(BOXES_DOWN) for eachBoxAcross in range(BOXES_ACROSS)]
 
     #assign colors and shapes to each box object
     for i,eachBox in enumerate(boxes):
-        eachBox._colorAndShape = BOARD[i]
+        eachBox._colorAndShape = [BOARD[i]]
         print(boxes[i]._colorAndShape)
             
     while True:
         for event in pygame.event.get():
+            
             #exit game when clicking on x button on window
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
+                
             elif event.type == MOUSEMOTION:
                 #highlight the box that mouse pointer hovers
                 mouseXY = pygame.mouse.get_pos()
                 for eachBox in boxes:
                     eachBox.highlightBox(*mouseXY)
-            elif event.type == MOUSEBUTTONUP:
-                #reveal the box clicked on
+                    
+            elif event.type == MOUSEBUTTONUP:                
                 mouseXY = pygame.mouse.get_pos()
                 for i, eachBox in enumerate(boxes):
+                    #if same box is clicked twice, continue to wait for next mouse event by going back to while loop
+                    #But: when the second box is NOT a match it remains closed, and when player clicks on it again, he intends to open it, so open it.
+                    if eachBox.mousePointerOnBox(*mouseXY) and eachBox._boxRevealed == True:
+                        if prevTopLeftX == eachBox._topLeftX and prevTopLeftY == eachBox._topLeftY:
+                            break
+                        else:
+                            prevTopLeftX = eachBox._topLeftX
+                            prevTopLeftY = eachBox._topLeftY
+                    #reveal the box clicked on
                     eachBox.revealBox(*mouseXY)
                     #see if two boxes are clicked and revealed; if both boxes have the same object inside keep both boxes open; if not close both boxes.
                     if eachBox._boxRevealed == True:
+                        if eachBox._firstOfTwoBoxes == True:
+                            continue
                         numBoxesRevealed += 1
                         if numBoxesRevealed == 1:
                             eachBox._firstOfTwoBoxes = True
                         if eachBox._firstOfTwoBoxes == True:
-                            firstBoxColorShape = eachBox._colorAndShape
+                            firstBoxColorShape = [eachBox._colorAndShape]
                             firstBoxIndex = i
-                            eachBox._firstOfTwoBoxes = False
                             break
                         if numBoxesRevealed == 2:
-                            secondBoxColorShape = eachBox._colorAndShape
+                            secondBoxColorShape = [eachBox._colorAndShape]
                             secondBoxIndex = i
+                            print("first:",firstBoxColorShape[0], "second:",secondBoxColorShape[0])
                             if len(firstBoxColorShape) != 0 and len(secondBoxColorShape) != 0:
                                 if (firstBoxColorShape == secondBoxColorShape):
-                                    print(numBoxesRevealed)
-                                    print(firstBoxColorShape,firstBoxIndex)
-                                    print(secondBoxColorShape, secondBoxIndex)
                                     print("Hooray")
+                                    print(boxes[firstBoxIndex]._colorAndShape, boxes[secondBoxIndex]._colorAndShape)
                                     del boxes[firstBoxIndex], boxes[secondBoxIndex]
                                     print("New game board length: ",len(boxes))
                                 else:
@@ -226,8 +240,8 @@ def main():
                                     boxes[firstBoxIndex].__init__(boxes[firstBoxIndex]._topLeftX,boxes[firstBoxIndex]._topLeftY)
                                     boxes[secondBoxIndex].__init__(boxes[secondBoxIndex]._topLeftX,boxes[secondBoxIndex]._topLeftY)
                             numBoxesRevealed = 0
-                            firstBoxColorShape = ()
-                            secondBoxColorShape = ()
+                            del firstBoxColorShape[0], secondBoxColorShape[0]
+                            #print(firstBoxColorShape[0], secondBoxColorShape[0])
                             break
                 
                         
@@ -236,4 +250,4 @@ def main():
     
 if __name__ == '__main__':
     main()
-    
+    #edgwygdywegdywgdyyudwywd
