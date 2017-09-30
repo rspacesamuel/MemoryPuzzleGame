@@ -1,5 +1,10 @@
 # MemoryPuzzleGame
-Game written in Python to learn the language
-More details on the code, acknowledgements etc. coming soon..
+This game was written purely for the joy of it and for me to learn more Python along the way.
+The code runs, but as of writing this documentation, it is still very much a work-in-progress. (Being a full time single dad has its tolls on being a full time nerd.)
+
+I learnt the basics of graphics package (Pygame, FPS, event handling etc.) from http://inventwithpython.com/ - a great source for learning Python. They have the full source code for this game to be downloaded for free. But none of my code is copied from it. 
+
+For example, I designed this to be an Object Oriented system (again, just to learn Python's OO and also to be original). Neither did I read the source code in http://inventwithpython.com/ (except for a few lines to understand the basics of graphics package); nor did I refer back to it when I get stuck.. just to avoid the trap of not thinking hard enough. Of course I googled for clues.
+
 Thanks for stopping by.
-Raj
+Raj Samuel
