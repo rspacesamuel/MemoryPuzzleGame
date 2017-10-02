@@ -217,8 +217,6 @@ def main():
                         eachBox.revealBox(*mouseXY)
                         numBoxesRevealed += 1
                         if numBoxesRevealed == 1:
-                            eachBox._firstOfTwoBoxes = True
-                        if eachBox._firstOfTwoBoxes == True:
                             firstBoxColorShape = eachBox._colorAndShape
                             firstBoxIndex = i
                             break
