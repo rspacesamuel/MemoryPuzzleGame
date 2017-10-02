@@ -74,6 +74,8 @@ def main():
     firstBoxIndex = -1
     secondBoxIndex = -1
     numBoxesRevealed = 0
+    prevTopLeftX = -1
+    prevTopLeftY = -1
     
     pygame.init()
     gamesurface = pygame.display.set_mode ((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -89,15 +91,15 @@ def main():
         boxHeight = 50
         
         def __init__(self, topLeftX, topLeftY):
-            #initialize object specific variables for each box and draw the boxes
+            #initialize object specific variables for each box
             self._topLeftX = topLeftX
             self._topLeftY = topLeftY
             self._boxHighlighted = False
             self._boxRevealed = False
             self._boxRevealedAndScored = False
             self._firstOfTwoBoxes = False
-            #self._secondOfTwoBoxes = False
             self._colorAndShape = []
+            #draw box
             pygame.draw.rect(gamesurface, self.boxOuterColor, (self._topLeftX, self._topLeftY, self.boxWidth, self.boxHeight),0)
             pygame.draw.rect(gamesurface, self.boxBorderColor, (self._topLeftX, self._topLeftY, self.boxWidth, self.boxHeight),2)
 
@@ -123,7 +125,7 @@ def main():
 
         def revealBox(self, mouseX, mouseY):
                 self._boxRevealed = True
-                                 
+                                
                 if self._colorAndShape[0][1] == "SQUARE":
                     #assign point list (x,y of each vertex) to a variable
                     squareVertices = [(self._topLeftX+15, self._topLeftY+15), (self.boxWidth-30, self.boxHeight-30)]
@@ -181,11 +183,9 @@ def main():
     #instantiate the Object List for Box
     boxes = [Box(*incrementXY(eachBoxAcross)) for eachBoxDown in range(BOXES_DOWN) for eachBoxAcross in range(BOXES_ACROSS)]
 
-    #assign colors and shapes to each box object
-    for i,eachBox in enumerate(boxes):
+    for i, eachBox in enumerate(boxes):
         eachBox._colorAndShape = [BOARD[i]]
-        print(boxes[i]._colorAndShape[0][1], i, BOARD[i])
-            
+        
     while True:
         for event in pygame.event.get():
             
@@ -203,16 +203,18 @@ def main():
             elif event.type == MOUSEBUTTONUP:                
                 mouseXY = pygame.mouse.get_pos()
                 for i, eachBox in enumerate(boxes):
-                    #reveal the box clicked on
                     if eachBox.mousePointerOnBox(*mouseXY) and eachBox._boxRevealedAndScored == False:
+                        #if the box is clicked twice (or more) do nothing
+                        if prevTopLeftX == eachBox._topLeftX and prevTopLeftY == eachBox._topLeftY:
+                            #but: when the second box don't match with first it remains closed, and if it's clicked again,
+                            #the player intends to open it, so open it. Ignore all other cases of clicking twice.
+                            if numBoxesRevealed != 0:
+                                break
+                        else:
+                            prevTopLeftX = eachBox._topLeftX
+                            prevTopLeftY = eachBox._topLeftY
+                        #reveal the box. Then check if it's first or second box.
                         eachBox.revealBox(*mouseXY)
-                        '''
-                        if eachBox._secondOfTwoBoxes == True:
-                            eachBox._secondOfTwoBoxes = False
-                        elif boxes[secondBoxIndex]._secondOfTwoBoxes = True:
-                            boxes[secondBoxIndex]._secondOfTwoBoxes = False
-                        if eachBox._firstOfTwoBoxes == True:
-                            break'''
                         numBoxesRevealed += 1
                         if numBoxesRevealed == 1:
                             eachBox._firstOfTwoBoxes = True
@@ -221,26 +223,21 @@ def main():
                             firstBoxIndex = i
                             break
                         if numBoxesRevealed == 2:
-                            #eachBox._secondOfTwoBoxes = True
-                            #i want to play wrestle
-                        #if eachBox._secondOfTwoBoxes == True:
                             secondBoxColorShape = eachBox._colorAndShape
                             secondBoxIndex = i
-                            print("first:",firstBoxColorShape, "second:",secondBoxColorShape)
-                            #moment of truth: if both boxes clicked reveal the same items, mark them as scored, else move on
-                            #print(len(firstBoxColorShape), len(secondBoxColorShape))
+                            #moment of truth: if both boxes revealed the same items, mark both boxes as scored, else move on
                             if len(firstBoxColorShape) != 0 and len(secondBoxColorShape) != 0:
                                 if (firstBoxColorShape == secondBoxColorShape):
-                                    print("Hooray")
                                     boxes[firstBoxIndex]._boxRevealedAndScored = True
                                     boxes[secondBoxIndex]._boxRevealedAndScored = True
                                 else:
                                     pygame.time.wait(1000)
+                                    #is this init calling appropriate??
                                     boxes[firstBoxIndex].__init__(boxes[firstBoxIndex]._topLeftX,boxes[firstBoxIndex]._topLeftY)
                                     boxes[secondBoxIndex].__init__(boxes[secondBoxIndex]._topLeftX,boxes[secondBoxIndex]._topLeftY)
+                                    #init resets the box's color and shape, so get it back from BOARD
                                     boxes[firstBoxIndex]._colorAndShape = [BOARD[firstBoxIndex]]
                                     boxes[secondBoxIndex]._colorAndShape = [BOARD[secondBoxIndex]]
-                                    #boxes[secondBoxIndex]._secondOfTwoBoxes = True
                             numBoxesRevealed = 0
                             del firstBoxColorShape[0], secondBoxColorShape[0]
                             break                
