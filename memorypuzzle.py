@@ -1,4 +1,8 @@
-#my draft for memory puzzle game
+#Memory Puzzle Game
+#Written by Raj Samuel
+#Latest copy available at https://github.com/rsamuel1181/MemoryPuzzleGame
+#Send suggestions to rsamuel1181@gmail.com
+
 import pygame, sys, random, itertools
 from pygame.locals import *
 
