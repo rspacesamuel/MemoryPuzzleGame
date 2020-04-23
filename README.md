@@ -1,6 +1,5 @@
 # MemoryPuzzleGame
 This game was written purely for the joy of it and for me to learn more Python along the way.
-The game works perfectly but without much frills and thrills. (Being a full time single dad has its tolls on being a full time nerd.)
 
 I learnt the basics of graphics package (Pygame, FPS, event handling etc.) from http://inventwithpython.com/ - a great source for learning Python. They have the full source code for this game to be downloaded for free. But none of my code is copied from it. 
 
